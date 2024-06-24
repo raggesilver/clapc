@@ -40,7 +40,7 @@
 
 // Test framework ==============================================================
 
-static int result = 0;
+static int _ctest_result = 0;
 static int assertions = 0;
 static int failed_assertions = 0;
 
@@ -48,8 +48,6 @@ static int function_assertions = 0;
 static int function_skipped_assertions = 0;
 static int function_failed_assertions = 0;
 static bool function_skip = false;
-
-#define TEST_RESULTS result
 
 #define begin_test(func)                                                       \
   do {                                                                         \
@@ -87,10 +85,11 @@ static bool function_skip = false;
 #define end_suite()                                                            \
   ({                                                                           \
     fprintf(stdout, "\nTest suite completed %s\n" RESET,                       \
-      result == 0 ? BOLD_GREEN "successfully" : BOLD_RED "with failures");     \
+      _ctest_result == 0 ? BOLD_GREEN "successfully"                           \
+                         : BOLD_RED "with failures");                          \
     fprintf(stdout, "Total assertions: %d\n", assertions);                     \
     fprintf(stdout, "Failed assertions: %d\n", failed_assertions);             \
-    TEST_RESULTS;                                                              \
+    _ctest_result;                                                             \
   })
 
 /**
@@ -125,7 +124,7 @@ static bool function_skip = false;
         __LINE__, __func__);                                                   \
       failed_assertions++;                                                     \
       function_failed_assertions++;                                            \
-      result = RESULT_FAIL;                                                    \
+      _ctest_result = RESULT_FAIL;                                             \
       if (CTEST_FAILED_ASSERTION_ABORTS) {                                     \
         abort();                                                               \
       }                                                                        \

@@ -46,6 +46,7 @@ bool clapc_parse_safe(s_clap_arg* args[], char*** argv_ptr, char** error)
     if (arg[1] == '-') {
       // Found "--", skip parsing
       if (arg[2] == '\0') {
+        argv++;
         break;
       }
       is_long = true;
@@ -135,6 +136,7 @@ bool clapc_parse_safe(s_clap_arg* args[], char*** argv_ptr, char** error)
     arg = *++argv;
   }
 
+  *argv_ptr = argv;
   return true;
 }
 

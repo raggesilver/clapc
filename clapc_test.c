@@ -25,6 +25,7 @@ void explicit_long_boolean()
   expect(error == NULL);
   expect(result);
   expect(clap_arg_get_bool(&json_arg) == false);
+  expect(*argv_ptr == NULL);
 
   clapc_args_free(args);
 }
@@ -53,6 +54,7 @@ void implicit_boolean()
     expect(error == NULL);
     expect(result);
     expect(clap_arg_get_bool(&json_arg) == true);
+    expect(*argv_ptr == NULL);
 
     clapc_args_free(args);
   }
@@ -66,6 +68,7 @@ void implicit_boolean()
     expect(error == NULL);
     expect(result);
     expect(clap_arg_get_bool(&json_arg) == true);
+    expect(*argv_ptr == NULL);
 
     clapc_args_free(args);
   }
@@ -91,6 +94,48 @@ void string_arguments(void)
     expect(error == NULL);
     expect(result);
     expect(strcmp(clap_arg_get_string(&extensions_arg), "c,h") == 0);
+    expect(*argv_ptr == NULL);
+
+    clapc_args_free(args);
+  }
+}
+
+/**
+ * Ensure that arguments after a double dash are not parsed and the
+ */
+void double_dash(void)
+{
+  s_clap_arg extensions_arg = {
+    .name = "extensions",
+    .type = CLAP_ARG_TYPE_STRING,
+    .description = "A comma-separated list of file extensions to include",
+    .required = true,
+  };
+
+  s_clap_arg json_arg = {
+    .name = "json",
+    .type = CLAP_ARG_TYPE_BOOL,
+    .description = "If true, output will be in JSON format",
+    .required = false,
+  };
+
+  s_clap_arg* args[] = { &extensions_arg, &json_arg, NULL };
+
+  {
+    char* error;
+    char* argv[]
+      = { "clapc_test", "--extensions", "c,h", "--", "--json", NULL };
+    char** argv_ptr = argv;
+    bool result = clapc_parse_safe(args, &argv_ptr, &error);
+
+    expect(error == NULL);
+    expect(result);
+    expect(strcmp(clap_arg_get_string(&extensions_arg), "c,h") == 0);
+
+    // JSON should have been ignored
+    expect(json_arg.value == NULL);
+    expect(*argv_ptr != NULL);
+    expect(strcmp(*argv_ptr, "--json") == 0);
 
     clapc_args_free(args);
   }
@@ -104,6 +149,7 @@ int main(void)
   test(implicit_boolean);
 
   test(string_arguments);
+  test(double_dash);
 
   return end_suite();
 }
