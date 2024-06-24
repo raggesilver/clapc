@@ -73,8 +73,7 @@ typedef struct {
 #define clap_arg_get_bool(arg)                                                 \
   ({                                                                           \
     assert((arg)->type == CLAP_ARG_TYPE_BOOL);                                 \
-    assert((arg)->value != NULL);                                              \
-    *(bool*)(arg)->value;                                                      \
+    ((arg)->value) ? *(bool*)(arg)->value : false;                             \
   })
 
 /**
@@ -122,3 +121,6 @@ typedef struct {
  * updated to point to the next argument after the parsed arguments.
  */
 CLAPC_PUBLIC void clapc_parse(s_clap_arg* args[], char*** argv_ptr);
+
+CLAPC_PUBLIC void clapc_print_help(
+  const char* program_name, const char* description, s_clap_arg* args[]);

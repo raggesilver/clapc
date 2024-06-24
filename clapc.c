@@ -130,3 +130,49 @@ void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
     arg = *++argv;
   }
 }
+
+void clapc_print_help(
+  const char* program_name, const char* description, s_clap_arg* args[])
+{
+  int largest_name = 2;
+
+  for (int i = 0; args[i] != NULL; i++) {
+    s_clap_arg* arg = args[i];
+    if (arg->name == NULL) {
+      continue;
+    }
+    int name_len = strlen(arg->name) + 2;
+    int short_name_len = arg->short_name == 0 ? 0 : 2;
+
+    int total_length = name_len + short_name_len +
+      // If both a short and long name are present, add ", " between them
+      (short_name_len > 0 ? 2 : 0);
+
+    // TODO: in the future we may want to include <value> for non-bool args
+
+    if (total_length > largest_name) {
+      largest_name = total_length;
+    }
+  }
+
+  printf("%s\n\n%s\n\n", program_name, description);
+
+  printf("Options:\n");
+
+  char buffer[1024];
+
+  for (int i = 0; args[i] != NULL; i++) {
+    s_clap_arg* arg = args[i];
+    bool has_long_name = arg->name != NULL;
+    bool has_short_name = arg->short_name != 0;
+
+    sprintf(buffer, "%s%s%s%c", has_long_name ? "--" : "",
+      has_long_name ? arg->name : "",
+      has_long_name && has_short_name ? ", -" : "",
+      has_short_name ? arg->short_name : 0);
+
+    printf("  %-*s  %s\n", largest_name, buffer, arg->description);
+  }
+
+  printf("\n");
+}

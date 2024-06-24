@@ -47,6 +47,7 @@ int main([[maybe_unused]] int _argc, char** argv)
   };
 
   s_clap_arg* args[] = {
+    &help_arg,
     &json_arg,
     &extensions_arg,
     &precision_arg,
@@ -59,7 +60,7 @@ int main([[maybe_unused]] int _argc, char** argv)
   bool show_help = clap_arg_get_bool(&help_arg);
 
   if (show_help) {
-    // clapc_print_help(args);
+    clapc_print_help("clapc_test", "Test program for clapc", args);
     return 0;
   }
 
