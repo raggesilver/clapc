@@ -8,14 +8,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: fedora:latest
+      image: raggesilver/valgrind:latest
     steps:
       - id: checkout
         name: Checkout
         uses: actions/checkout@v4
-      - id: setup-gcc
-        name: Set up GCC
-        run: sudo dnf install -y gcc valgrind meson python3
       - id: test
         name: Run test
         run: |
