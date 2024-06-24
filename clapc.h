@@ -122,5 +122,45 @@ typedef struct {
  */
 CLAPC_PUBLIC void clapc_parse(s_clap_arg* args[], char*** argv_ptr);
 
+/**
+ * Parses the command-line arguments and populates the values of the arguments
+ * in the {@link args} array. This function is similar to {@link clapc_parse},
+ * but it returns a boolean indicating whether the parsing was successful, and
+ * an error message if the parsing failed.
+ *
+ * @param args The array of arguments to parse. This array should be
+ * null-terminated
+ * @param argv_ptr A pointer to the command-line arguments. This pointer will be
+ * updated to point to the next argument after the parsed arguments.
+ * @param error A pointer to a string that will be updated with an error message
+ * if the parsing fails. This string should be freed by the caller.
+ * @return true if the parsing was successful, false otherwise
+ */
+CLAPC_PUBLIC
+bool clapc_parse_safe(s_clap_arg* args[], char*** argv_ptr, char** error);
+
+/**
+ * Frees the memory allocated for an argument.
+ *
+ * @param arg The argument to free
+ */
+CLAPC_PUBLIC __attribute__((nonnull)) void clapc_arg_free(s_clap_arg* arg);
+
+/**
+ * Frees the memory allocated for an array of arguments.
+ *
+ * @param args The array of arguments to free
+ */
+CLAPC_PUBLIC void clapc_args_free(s_clap_arg* args[]);
+
+/**
+ * Prints the help message for the program. This function takes the program name
+ * and description, as well as an array of arguments, and prints a help message
+ * that describes the program and the arguments that it accepts.
+ *
+ * @param program_name The name of the program
+ * @param description A description of the program
+ * @param args An array of arguments that the program accepts
+ */
 CLAPC_PUBLIC void clapc_print_help(
   const char* program_name, const char* description, s_clap_arg* args[]);

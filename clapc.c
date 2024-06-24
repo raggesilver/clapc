@@ -21,8 +21,10 @@ __attribute__((format(printf, 2, 3), noreturn)) static void die(
   exit(status);
 }
 
-void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
+bool clapc_parse_safe(s_clap_arg* args[], char*** argv_ptr, char** error)
 {
+  *error = NULL;
+
   char** argv =
     // Skip first argument (it's always the executable name)
     (*argv_ptr + 1);
@@ -73,13 +75,15 @@ void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
     });
 
     if (clap_arg == NULL) {
-      die(1, "Invalid argument '%s'\n", arg);
+      asprintf(error, "Invalid argument '%s'\n", arg);
+      return false;
     }
 
     if (clap_arg->type != CLAP_ARG_TYPE_BOOL) {
       // We need to consume the next arg
       if (!argv[1]) {
-        die(1, "Missing positional argument for '%s'\n", *argv);
+        asprintf(error, "Missing positional argument for '%s'\n", *argv);
+        return false;
       }
 
       // TODO: real implementation (parse value according to type)
@@ -105,7 +109,8 @@ void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
         break;
       }
       default: {
-        die(1, "Invalid argument type\n");
+        asprintf(error, "Invalid argument type\n");
+        return false;
       }
       }
 
@@ -128,6 +133,16 @@ void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
     // TODO: go through all args and check if required args are present
 
     arg = *++argv;
+  }
+
+  return true;
+}
+
+void clapc_parse(s_clap_arg* args[], char*** argv_ptr)
+{
+  char* error = NULL;
+  if (!clapc_parse_safe(args, argv_ptr, &error)) {
+    die(1, "%s", error);
   }
 }
 
@@ -175,4 +190,19 @@ void clapc_print_help(
   }
 
   printf("\n");
+}
+
+void clapc_arg_free(s_clap_arg* arg)
+{
+  if (arg->value) {
+    free(arg->value);
+    arg->value = NULL;
+  }
+}
+
+void clapc_args_free(s_clap_arg* args[])
+{
+  for (int i = 0; args[i] != NULL; i++) {
+    clapc_arg_free(args[i]);
+  }
 }
