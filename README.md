@@ -16,5 +16,6 @@ command line argument parser for Rust, and clapc is inspired by it.
 
 ## Planned Features
 
+- Support for grouped short options (e.g. `-abc`).
 - Support for default values.
 - Support for subcommands.

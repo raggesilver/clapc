@@ -15,9 +15,11 @@ shlib = shared_library('clapc', 'clapc.c',
   gnu_symbol_visibility : 'hidden',
 )
 
-test_exe = executable('clapc_test', 'clapc_test.c',
-  link_with : shlib)
-test('clapc', test_exe)
+if get_option('tests')
+  test_exe = executable('clapc_test', 'clapc_test.c',
+    link_with : shlib)
+  test('clapc', test_exe)
+endif
 
 # Make this library usable as a Meson subproject.
 clapc_dep = declare_dependency(
@@ -32,7 +34,7 @@ pkg_mod = import('pkgconfig')
 pkg_mod.generate(
   name : 'clapc',
   filebase : 'clapc',
-  description : 'Meson sample project.',
+  description : 'A command line argument parser.',
   subdirs : 'clapc',
   libraries : shlib,
   version : '0.1',
